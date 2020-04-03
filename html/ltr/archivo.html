@@ -250,28 +250,8 @@
                                         <th scope="col">Descripción</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td class="text-success">Léxico</td>
-                                        <td>14</td>
-                                        <td>26</td>
-                                        <td>El caracter "@" no pertenece al lenguaje</td>
-                                    </tr>
-                                    <tr>
-                                        <td>2</td>
-                                        <td class="text-warning">Sintáctico</td>
-                                        <td>56</td>
-                                        <td>12</td>
-                                        <td>Se esperaba ";"</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3</td>
-                                        <td class="text-success">Léxico</td>
-                                        <td>74</td>
-                                        <td>34</td>
-                                        <td>El caracter "`" no pertenece al lenguaje</td>  
-                                    </tr>
+                                <tbody id="bodyErrores">
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -330,6 +310,7 @@
     <script src="../../assets/libs/quill/dist/quill.min.js"></script>
     <script src="../../assets/libs/toastr/build/toastr.min.js"></script>
     <script>
+        var listaError = new Array();
         var titulo = document.getElementById("labelArchivo");
         var btnBorrar = document.getElementById("btnBorrar");
         var quill = new Quill('#editor', {
@@ -362,9 +343,18 @@
             titulo.innerText = "";
             btnBorrar.disabled = true;
         }
+        function traducir(){
+            const entrada = quill.getText(0, quill.getLength());
+            lexicoToPython(entrada, quill.getLength());
+            console.log(listaToken);
+            mostrarTodo();
+            toastr.success('Traducción Finalizada con Éxito', 'Traducción');
+        }
     </script>
     <script src="../../html/programacion/principal.js"></script>
     <script src="../../html/programacion/obtener.js"></script>
+
+    <script src="../../html/programacion/mostrarTablas.js"></script>
     
 </body>
 

@@ -9,10 +9,6 @@ var reservadas = ["int", "double", "char", "bool", "string", "void", "main", "if
 var codHTML = "";
 
 function traducir(){
-    let element = {name: 'Edy', age: 27, country: "Brazil"};
-    let element2 = {name: 'Marcus', age: 27, country: "Brazil"};
-    listaToken.push(element);
-    listaToken.push(element2);
     const entrada = quill.getText(0, quill.getLength());
     lexicoToPython(entrada, quill.getLength());
     console.log(listaToken);
@@ -25,7 +21,6 @@ function lexicoToPython(texto, tamano){
     listaError = [];
     var auxPalabra = "";
     while(indice < tamano){
-        console.log(texto[indice]);
         switch(estado){
             case "A":
                 if(texto[indice] == '/' && texto[indice+1] == '/'){
@@ -78,6 +73,7 @@ function lexicoToPython(texto, tamano){
                     indice++;
                 }
                 else{
+                    auxPalabra+=texto[indice];
                     let error1 = {tipo: 'Léxico', l: linea, c: columna, desc: ' \"' + auxPalabra + '\" no pertenece al lenguaje'};
                     listaError.push(error1);
                     auxPalabra = "";
@@ -87,7 +83,7 @@ function lexicoToPython(texto, tamano){
                 }
                 break;
             case "B":
-                let token1 = {tipo: 'Símbolo', valor: auxPalabra, l: linea, c: columna};
+                let token1 = {iden: '5', tipo: 'Símbolo', valor: auxPalabra, l: linea, c: columna};
                 listaToken.push(token1);
                 auxPalabra = "";
                 estado = "A";
@@ -110,10 +106,10 @@ function lexicoToPython(texto, tamano){
                     let token;
                     if(esReservada(auxPalabra.toLowerCase())){
                         desc+=auxPalabra.toLowerCase();
-                        token = {tipo: desc, valor: auxPalabra, l:linea, c:columna};
+                        token = {iden: '2', tipo: desc, valor: auxPalabra, l:linea, c:columna};
                         listaToken.push(token);
                     }else{
-                        token = {tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
+                        token = {iden: '1',tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
                         listaToken.push(token);
                     }
                     auxPalabra = "";
@@ -124,9 +120,9 @@ function lexicoToPython(texto, tamano){
                 if(texto.charCodeAt(indice) == 39){ // '
                     let token;
                     if(auxPalabra.length == 1 || auxPalabra.length == 2)
-                        token = {tipo: 'Caracter', valor: auxPalabra, l:linea, c:columna};
+                        token = {iden: '3',tipo: 'Caracter', valor: auxPalabra, l:linea, c:columna};
                     else{
-                        token = {tipo: 'Cadena HTML', valor: auxPalabra, l:linea, c:columna};
+                        token = {iden: '4',tipo: 'Cadena HTML', valor: auxPalabra, l:linea, c:columna};
                         codHTML+=auxPalabra;
                     }
                     listaToken.push(token);
@@ -142,18 +138,18 @@ function lexicoToPython(texto, tamano){
                 }
                 break;
             case "E":
-                if(esNumero(texto, posicion)){
-                    auxPalabra+=texto[posicion];
+                if(esNumero(texto, indice)){
+                    auxPalabra+=texto[indice];
                     indice++;
                     columna++;
                     estado = "E";
-                }else if(texto.charCodeAt(posicion) == 46){
-                    auxPalabra+=texto[posicion];
+                }else if(texto.charCodeAt(indice) == 46){
+                    auxPalabra+=texto[indice];
                     indice++;
                     columna++;
                     estado = "H";
                 }else{
-                    let token = {tipo: 'Número', valor: auxPalabra, l: linea, c: columna};
+                    let token = {iden: '7', tipo: 'Número', valor: auxPalabra, l: linea, c: columna};
                     listaToken.push(token);
                     auxPalabra = "";
                     estado = "A";
@@ -161,7 +157,7 @@ function lexicoToPython(texto, tamano){
                 break;
             case "F":
                 if(texto.charCodeAt(indice) == 34){ // "
-                    let token = {tipo: 'Cadena', valor: auxPalabra, l:linea, c:columna};
+                    let token = {iden: '6', tipo: 'Cadena', valor: auxPalabra, l:linea, c:columna};
                     listaToken.push(token);
                     auxPalabra = "";
                     estado = "A";
@@ -181,7 +177,7 @@ function lexicoToPython(texto, tamano){
                     columna++;
                     estado = "G";
                 }else{
-                    let token = {tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
+                    let token = {iden: '1', tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
                     listaToken.push(token);
                     auxPalabra = "";
                     estado = "A";
@@ -195,7 +191,53 @@ function lexicoToPython(texto, tamano){
                     estado = "I";
                 }else{
                     estado = "A";
-                    
+                    auxPalabra+=texto[indice];
+                    let error1 = {tipo: 'Léxico', l: linea, c: columna, desc: ' \"' + auxPalabra + '\" no pertenece al lenguaje'};
+                    listaError.push(error1);
+                    auxPalabra = "";
+                }
+                break;
+            case "I":
+                if(esNumero(texto, indice)){
+                    auxPalabra+=texto[indice];
+                    indice++;
+                    columna++;
+                    estado = "I";
+                }else{
+                    let token = {iden: '7', tipo: 'Número', valor: auxPalabra, l: linea, c: columna};
+                    listaToken.push(token);
+                    auxPalabra = "";
+                    estado = "A";
+                }
+                break;
+            case "J":
+                if(texto.charCodeAt(indice) == 10){
+                    estado = "A";
+                    indice++;
+                    columna = 1;
+                    linea++;
+                }
+                else{
+                    estado = "J";
+                    indice++;
+                    columna++;
+                }
+                break;
+            case "K":
+                if(texto.charCodeAt(indice) == 42 && texto.charCodeAt(indice+1) == 47){ //  */
+                    estado = "A";
+                    indice++;
+                    columna++;
+                }
+                else if(texto.charCodeAt(indice) == 10){ // \n
+                    estado = "K";
+                    indice++;
+                    columna = 1;
+                    linea++;
+                }else{
+                    estado = "K";
+                    indice++;
+                    columna++;
                 }
                 break;
         }
@@ -224,7 +266,6 @@ function esLetra(entrada, posicion){
 }
 
 function esSimbolo(entrada, posicion){
-    console.log(entrada.charCodeAt(posicion));
     if(entrada.charCodeAt(posicion) == 33 || entrada.charCodeAt(posicion) == 38){ 
         return true;
     }else if (entrada.charCodeAt(posicion) > 39 && entrada.charCodeAt(posicion) < 48){ 

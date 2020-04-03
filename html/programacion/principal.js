@@ -6,6 +6,7 @@ var linea = 1;
 var columna = 1;
 var reservadas = ["int", "double", "char", "bool", "string", "void", "main", "if", "do", "false", "continue", "else", "switch", "case", "break",
     "console", "write", "default", "for", "while", "true", "return"];
+var codHTML = "";
 
 function traducir(){
     let element = {name: 'Edy', age: 27, country: "Brazil"};
@@ -77,8 +78,9 @@ function lexicoToPython(texto, tamano){
                     indice++;
                 }
                 else{
-                    let error1 = {tipo: 'Léxico', l: linea, c: columna, desc: 'El caracter \"' + texto[indice] + '\" no pertenece al lenguaje'};
+                    let error1 = {tipo: 'Léxico', l: linea, c: columna, desc: ' \"' + auxPalabra + '\" no pertenece al lenguaje'};
                     listaError.push(error1);
+                    auxPalabra = "";
                     indice++;
                     columna++;
                     estado = "A";
@@ -97,20 +99,21 @@ function lexicoToPython(texto, tamano){
                     columna++;
                     estado = "C";
                 }
-                else if(esNumero(texto, indice)){
+                else if(esNumero(texto, indice) || texto.charCodeAt(indice) == 95){ // 95 -> '_'
                     auxPalabra+=texto[indice];
                     indice++;
-                    linea++;
+                    columna++;
                     estado = "G";
                 }
                 else{
                     let desc = "Palabra reservada: ";
+                    let token;
                     if(esReservada(auxPalabra.toLowerCase())){
                         desc+=auxPalabra.toLowerCase();
-                        let token = {tipo: desc, valor: auxPalabra, l:linea, c:columna};
+                        token = {tipo: desc, valor: auxPalabra, l:linea, c:columna};
                         listaToken.push(token);
                     }else{
-                        let token = {tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
+                        token = {tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
                         listaToken.push(token);
                     }
                     auxPalabra = "";
@@ -118,7 +121,82 @@ function lexicoToPython(texto, tamano){
                 }
                 break;
             case "D":
-                
+                if(texto.charCodeAt(indice) == 39){ // '
+                    let token;
+                    if(auxPalabra.length == 1 || auxPalabra.length == 2)
+                        token = {tipo: 'Caracter', valor: auxPalabra, l:linea, c:columna};
+                    else{
+                        token = {tipo: 'Cadena HTML', valor: auxPalabra, l:linea, c:columna};
+                        codHTML+=auxPalabra;
+                    }
+                    listaToken.push(token);
+                    auxPalabra = "";
+                    estado = "A";
+                    indice++;
+                    columna++;
+                }else{
+                    auxPalabra+=texto[indice];
+                    indice++;
+                    columna++;
+                    estado = "D";
+                }
+                break;
+            case "E":
+                if(esNumero(texto, posicion)){
+                    auxPalabra+=texto[posicion];
+                    indice++;
+                    columna++;
+                    estado = "E";
+                }else if(texto.charCodeAt(posicion) == 46){
+                    auxPalabra+=texto[posicion];
+                    indice++;
+                    columna++;
+                    estado = "H";
+                }else{
+                    let token = {tipo: 'Número', valor: auxPalabra, l: linea, c: columna};
+                    listaToken.push(token);
+                    auxPalabra = "";
+                    estado = "A";
+                }
+                break;
+            case "F":
+                if(texto.charCodeAt(indice) == 34){ // "
+                    let token = {tipo: 'Cadena', valor: auxPalabra, l:linea, c:columna};
+                    listaToken.push(token);
+                    auxPalabra = "";
+                    estado = "A";
+                    indice++;
+                    columna++;
+                }else{
+                    auxPalabra+=texto[indice];
+                    indice++;
+                    columna++;
+                    estado = "F";
+                }
+                break;
+            case "G":
+                if(esLetra(texto, indice) || esNumero(texto, indice) || texto.charCodeAt(indice) == 95){
+                    auxPalabra+=texto[indice];
+                    indice++;
+                    columna++;
+                    estado = "G";
+                }else{
+                    let token = {tipo: 'Identificador', valor: auxPalabra, l:linea, c:columna};
+                    listaToken.push(token);
+                    auxPalabra = "";
+                    estado = "A";
+                }
+                break;
+            case "H":
+                if(esNumero(texto, indice)){
+                    auxPalabra+=texto[indice];
+                    indice++;
+                    columna++;
+                    estado = "I";
+                }else{
+                    estado = "A";
+                    
+                }
                 break;
         }
     }

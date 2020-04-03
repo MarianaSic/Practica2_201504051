@@ -345,14 +345,14 @@
         }
         function traducir(){
             const entrada = quill.getText(0, quill.getLength());
-            lexicoToPython(entrada, quill.getLength());
+            sintacticoToPython(lexicoToPython(entrada, quill.getLength()));
             console.log(listaToken);
             mostrarTodo();
             toastr.success('Traducción Finalizada con Éxito', 'Traducción');
         }
     </script>
     <script src="../../html/programacion/principal.js"></script>
-    <script src="../../html/programacion/obtener.js"></script>
+    <script src="../../html/programacion/sintactico.js"></script>
 
     <script src="../../html/programacion/mostrarTablas.js"></script>
     

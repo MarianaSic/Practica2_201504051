@@ -247,6 +247,7 @@ function lexicoToPython(texto, tamano){
                 break;
         }
     }
+    return listaToken;
 }
 
 function esReservada(palabra){

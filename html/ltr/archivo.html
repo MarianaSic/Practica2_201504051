@@ -310,7 +310,7 @@
     <script src="../../assets/libs/quill/dist/quill.min.js"></script>
     <script src="../../assets/libs/toastr/build/toastr.min.js"></script>
     <script>
-        var listaError = new Array();
+        var listaError = [];
         var titulo = document.getElementById("labelArchivo");
         var btnBorrar = document.getElementById("btnBorrar");
         var quill = new Quill('#editor', {
@@ -345,7 +345,8 @@
         }
         function traducir(){
             const entrada = quill.getText(0, quill.getLength());
-            sintacticoToPython(lexicoToPython(entrada, quill.getLength()));
+            lexicoToPython(entrada, quill.getLength());
+            sintacticoToPython();
             console.log(listaToken);
             mostrarTodo();
             toastr.success('Traducción Finalizada con Éxito', 'Traducción');

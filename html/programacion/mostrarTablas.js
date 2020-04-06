@@ -1,5 +1,6 @@
 function mostrarTodo(){
     mostrarErrores();
+    mostrarResultadoPython();
 }
 
 
@@ -29,4 +30,8 @@ function mostrarErrores(){
         cuerpo.appendChild(tr);
     }
     tabla.appendChild(cuerpo);
+}
+
+function mostrarResultadoPython(){
+    document.getElementById("outputPython").innerText = traduccionPython;
 }

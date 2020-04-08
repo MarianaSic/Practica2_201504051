@@ -1,6 +1,8 @@
 function mostrarTodo(){
     mostrarErrores();
     mostrarResultadoPython();
+    mostrarVariables();
+    mostrarHTML();
 }
 
 
@@ -33,5 +35,35 @@ function mostrarErrores(){
 }
 
 function mostrarResultadoPython(){
+    document.getElementById("outputPython").innerText = "";
     document.getElementById("outputPython").innerText = traduccionPython;
+}
+
+function mostrarVariables(){
+    var tabla = document.getElementById('tablaVariables');
+    tabla.removeChild(document.getElementById('bodyVariables'));
+    var cuerpo = document.createElement('tbody');
+    cuerpo.setAttribute('id', 'bodyVariables');
+
+    for(var i = 0; i < listaVariables.length; i++){
+        var tr = document.createElement('tr');
+        var td1 = document.createElement('td');
+        td1.innerHTML = listaVariables[i].nombre;
+        tr.appendChild(td1);
+        var td2 = document.createElement('td');
+        td2.innerHTML = listaVariables[i].tipo;
+        tr.appendChild(td2);
+        var td3 = document.createElement('td');
+        td3.innerHTML = listaVariables[i].linea;
+        tr.appendChild(td3);
+        cuerpo.appendChild(tr);
+    }
+    tabla.appendChild(cuerpo);
+}
+
+function mostrarHTML(){
+    document.getElementById("outputHTML").innerText = "";
+    document.getElementById("outputHTML").innerText = htmlResultante;
+    //analizar lexicamente la cadena HTML
+    //analizarHTML(htmlResultante);
 }

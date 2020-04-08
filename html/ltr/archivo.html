@@ -10,7 +10,7 @@
     <meta name="author" content="">
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="../../assets/images/favicon.png">
-    <title>Archivo</title>
+    <title>Traductor</title>
     <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="../../assets/libs/select2/dist/css/select2.min.css">
     <link rel="stylesheet" type="text/css" href="../../assets/libs/jquery-minicolors/jquery.minicolors.css">
@@ -164,7 +164,7 @@
                                                 <th>Línea</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="bodyVariables">
                                             
                                         </tbody>
                                         <tfoot>
@@ -191,7 +191,7 @@
                         <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
                           <div class="card-body">
                             <h5 class="card-title">&#9002; Código resultante en Python</h5>
-                                <pre id="outputPython"></pre>
+                                <pre text-align="text-center" id="outputPython"></pre>
                           </div>
                         </div>
                     </div>
@@ -310,7 +310,7 @@
     <script src="../../assets/libs/quill/dist/quill.min.js"></script>
     <script src="../../assets/libs/toastr/build/toastr.min.js"></script>
     <script>
-        var listaError = [];
+        var listaError = new Array();
         var titulo = document.getElementById("labelArchivo");
         var btnBorrar = document.getElementById("btnBorrar");
         var quill = new Quill('#editor', {
@@ -344,10 +344,11 @@
             btnBorrar.disabled = true;
         }
         function traducir(){
+            btnBorrar.disabled = false;
             const entrada = quill.getText(0, quill.getLength());
             lexicoToPython(entrada, quill.getLength());
-            sintacticoToPython();
             console.log(listaToken);
+            sintacticoToPython();
             mostrarTodo();
             toastr.success('Traducción Finalizada con Éxito', 'Traducción');
         }

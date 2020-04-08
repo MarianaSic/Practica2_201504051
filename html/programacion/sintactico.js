@@ -7,18 +7,20 @@ var listaVariables = new Array();
 function sintacticoToPython(){
     lista = listaToken;
     tamano = listaToken.length;
-    LINSTRUCCION();
+    LINSTRUCCION(false);
 }
 
-function LINSTRUCCION(){
+function LINSTRUCCION(conTab){
     if(i < tamano){
         if(tkIgual(lista[i].tipo, 'Comentario Simple')){
+            if(conTab) traduccionPython+="\t";
             traduccionPython+=lista[i-1].valor.replace("//", "#");
-            LINSTRUCCION();
+            LINSTRUCCION(conTab);
         }else if(tkIgual(lista[i].tipo, 'Comentario Multilínea')){
+            if(conTab) traduccionPython+="\t";
             var var1 = lista[i-1].valor.replace("/*", "'''");
             traduccionPython+=var1.replace("*/", "'''") + "\n";
-            LINSTRUCCION();
+            LINSTRUCCION(conTab);
         }else if(tkIgual(lista[i].iden, 2)){
             i--;
             if(tkIgual(lista[i].valor.toLowerCase(), "int") || tkIgual(lista[i].valor.toLowerCase(), "double") || tkIgual(lista[i].valor.toLowerCase(), "char")
@@ -29,12 +31,13 @@ function LINSTRUCCION(){
                 if(id){
                     var idValor = lista[i-1].valor;
                     if(tkIgual(lista[i].valor, "(")){
+                        if(conTab) traduccionPython+="\t";
                         traduccionPython+="\ndef " + idValor + "(";
                         LPARAM();
                         if(tkIgual(lista[i].valor, ")")){
                             traduccionPython+="): \n";
                             if(tkIgual(lista[i].valor, "{")){
-                                LINSTRUCCION();
+                                LINSTRUCCION(true);
                                 if(!tkIgual(lista[i].valor, "}")){
                                     let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
                                     listaError.push(error1);
@@ -50,11 +53,12 @@ function LINSTRUCCION(){
                             listaError.push(error1);
                             traduccionPython+="):";
                         }
-                        LINSTRUCCION();
+                        LINSTRUCCION(false);
                     }else if(tkIgual(lista[i].valor, ",")){
                         // , id LISTAID = E ;
                         let variable = {nombre: idValor, tipo: tipo, linea: lineaVariable};
                         listaVariables.push(variable);
+                        if(conTab) traduccionPython+="\t";
                         traduccionPython+="var " + idValor + ", ";
                         var identi = tkIgual(lista[i].tipo, 'Identificador');
                         if(identi){
@@ -71,60 +75,72 @@ function LINSTRUCCION(){
                                 let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba ";" ó "=" y vino ' + lista[i].valor};
                                 listaError.push(error1);
                             }
+                            traduccionPython+="\n";
                         }else{
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba identificador y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        LINSTRUCCION();
+                        LINSTRUCCION(conTab);
                     }else if(tkIgual(lista[i].valor, "=")){
                         // = E ;
                         let variable = {nombre: idValor, tipo: tipo, linea: lineaVariable};
                         listaVariables.push(variable);
+                        if(conTab) traduccionPython+="\t";
                         traduccionPython+="var " + idValor + " = ";
                         E();
-                        console.log("despues de E");
                         if(!tkIgual(lista[i].valor, ";")){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba ";" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        LINSTRUCCION();
+                        traduccionPython+="\n";
+                        LINSTRUCCION(conTab);
                     }else if(tkIgual(lista[i].valor, ";")){
                         //;
                         let variable = {nombre: idValor, tipo: tipo, linea: lineaVariable};
                         listaVariables.push(variable);
+                        if(conTab) traduccionPython+="\t";
                         traduccionPython+="var " + idValor + "\n";
-                        LINSTRUCCION();
+                        LINSTRUCCION(conTab);
                     }else{
                         let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "(", ";" ó "=" y vino ' + lista[i].valor};
                         listaError.push(error1);
-                        LINSTRUCCION();
+                        LINSTRUCCION(conTab);
                     }
                 }else{
                     let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba identificador y vino ' + lista[i].valor};
                     listaError.push(error1);
-                    LINSTRUCCION();
+                    LINSTRUCCION(conTab);
                 }
             }else if(tkIgual(lista[i].valor.toLowerCase(), "void")){
-                traduccionPython+="\ndef ";
+                if(conTab) traduccionPython+="\t";
+                traduccionPython+="\n\ndef ";
                 if(tkIgual(lista[i].valor.toLowerCase(), "main")){
                     if(tkIgual(lista[i].valor, "(") && tkIgual(lista[i].valor, ")")){
                         if(tkIgual(lista[i].valor, "{")){
                             traduccionPython+="main():\n";
+                            LINSTRUCCION(true);
+                            traduccionPython+="\n\nif__name__=\"__main__\":\n\tmain()\n\n";
+                            if(!tkIgual(lista[i].valor, "}")){
+                                let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
+                                listaError.push(error1);
+                            }
+                            LINSTRUCCION(false);
                         }
                     }
                 }else if(tkIgual(lista[i].iden, 1)){
-
+                    //void id()
                 }
             }
         }else if(tkIgual(lista[i].iden, 1)){
             var idValor = lista[i-1].valor;
             if(tkIgual(lista[i].valor, "(")){
+                if(conTab) traduccionPython+="\t";
                 traduccionPython+="\ndef " + idValor + "(";
                 LPARAM();
                 if(tkIgual(lista[i].valor, ")")){
                     traduccionPython+="): \n";
                     if(tkIgual(lista[i].valor, "{")){
-                        LINSTRUCCION();
+                        LINSTRUCCION(true);
                         if(!tkIgual(lista[i].valor, "}")){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
                             listaError.push(error1);
@@ -140,11 +156,12 @@ function LINSTRUCCION(){
                     listaError.push(error1);
                     traduccionPython+="):";
                 }
-                LINSTRUCCION();
+                LINSTRUCCION(false);
             }else if(tkIgual(lista[i].valor, ",")){
                 // , id LISTAID = E ;
                 let variable = {nombre: idValor, tipo: tipo, linea: lineaVariable};
                 listaVariables.push(variable);
+                if(conTab) traduccionPython+="\t";
                 traduccionPython+="var " + idValor + ", ";
                 var identi = tkIgual(lista[i].tipo, 'Identificador');
                 if(identi){
@@ -161,33 +178,36 @@ function LINSTRUCCION(){
                         let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba ";" ó "=" y vino ' + lista[i].valor};
                         listaError.push(error1);
                     }
+                    traduccionPython+="\n";
                 }else{
                     let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba identificador y vino ' + lista[i].valor};
                     listaError.push(error1);
                 }
-                LINSTRUCCION();
+                LINSTRUCCION(conTab);
             }else if(tkIgual(lista[i].valor, "=")){
                 // = E ;
                 let variable = {nombre: idValor, tipo: tipo, linea: lineaVariable};
                 listaVariables.push(variable);
+                if(conTab) traduccionPython+="\t";
                 traduccionPython+="var " + idValor + " = ";
                 E();
-                console.log("despues de E");
                 if(!tkIgual(lista[i].valor, ";")){
                     let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba ";" y vino ' + lista[i].valor};
                     listaError.push(error1);
                 }
-                LINSTRUCCION();
+                traduccionPython+="\n";
+                LINSTRUCCION(conTab);
             }else if(tkIgual(lista[i].valor, ";")){
                 //;
                 let variable = {nombre: idValor, tipo: tipo, linea: lineaVariable};
                 listaVariables.push(variable);
+                if(conTab) traduccionPython+="\t";
                 traduccionPython+="var " + idValor + "\n";
-                LINSTRUCCION();
+                LINSTRUCCION(conTab);
             }else{
                 let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "(", ";" ó "=" y vino ' + lista[i].valor};
                 listaError.push(error1);
-                LINSTRUCCION();
+                LINSTRUCCION(conTab);
             }
         }
     }

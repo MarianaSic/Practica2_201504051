@@ -1,10 +1,13 @@
 var listaToken = new Array();
+var tokenHTML = new Array();
 var estado = "A";
 var indice = 0;
 var linea = 1;
 var columna = 1;
 var reservadas = ["int", "double", "char", "bool", "string", "void", "main", "if", "do", "false", "continue", "else", "switch", "case", "break",
     "console", "write", "default", "for", "while", "true", "return"];
+var reservadaHTML = ["html", "head", "body", "title", "div", "br", "p", "h1", "h2", "h3", "h4", "button", "red", "label", "input", "style",
+    "background", "yellow", "green", "blue", "white", "skyblue"];
 var codHTML = "";
 
 function lexicoToPython(texto, tamano){
@@ -250,9 +253,68 @@ function lexicoToPython(texto, tamano){
     return listaToken;
 }
 
+function lexicoToHTML(texto, tamano){
+    indice = 0; linea = 1; columna = 1;
+    tokenHTML = [];
+    var auxPalabra = "";
+    estado = "A";
+    while(indice < tamano){
+        switch(estado){
+            case "A":
+                if(texto.charCodeAt(indice) == 10){ // \n
+                    indice++;
+                    linea++;
+                    columna = 1;
+                    estado = "A";
+                }else if(esBlanco(texto, indice)){
+                    indice++;
+                    columna++;
+                    estado = "A";
+                }else if(esSimbolo(texto, indice)){
+                    auxPalabra+=texto[indice];
+                    estado = "B";
+                    columna++;
+                    indice++;
+                }else if(esLetra(texto, indice)){
+                    auxPalabra += texto[indice];
+                    estado = "C";
+                    columna++;
+                    indice++;
+                }
+                else{
+                    auxPalabra+=texto[indice];
+                    let error1 = {tipo: 'Léxico HTML', l: linea, c: columna, desc: ' \"' + auxPalabra + '\" no pertenece al lenguaje'};
+                    listaError.push(error1);
+                    auxPalabra = "";
+                    indice++;
+                    columna++;
+                    estado = "A";
+                }
+                break;
+            case "B":
+                if(texto.charCodeAt(indice) == 60){ // es <
+
+                }else{
+                    let token1 = {iden: 5, tipo: 'Símbolo', valor: auxPalabra, l: linea, c: columna};
+                    tokenHTML.push(token1);
+                    auxPalabra = "";
+                    estado = "A";
+                }
+                break;
+        }
+    }
+}
+
 function esReservada(palabra){
     for(var i = 0; i < reservadas.length; i++){
         if(reservadas[i] == palabra) return true;
+    }
+    return false;
+}
+
+function esReservadaHTML(palabra){
+    for(var i = 0; i < reservadaHTML.length; i++){
+        if(reservadaHTML[i] == palabra) return true;
     }
     return false;
 }
@@ -281,6 +343,14 @@ function esSimbolo(entrada, posicion){
     }else if (entrada.charCodeAt(posicion) > 122 && entrada.charCodeAt(posicion) < 126){ 
         return true;
     }else{ return false; }
+}
+
+function esSimboloHTML(entrada, posicion){
+    if(entrada.charCodeAt(posicion) > 59 && entrada.charCodeAt(posicion) < 63) return true;
+    else if(entrada.charCodeAt(posicion) == 47) return true;
+    else if(entrada.charCodeAt(posicion) == 34) return true;
+    else if(entrada.charCodeAt(posicion) == 58) return true;
+    else return false;
 }
 
 function esBlanco(entrada, posicion){

@@ -65,5 +65,5 @@ function mostrarHTML(){
     document.getElementById("outputHTML").innerText = "";
     document.getElementById("outputHTML").innerText = htmlResultante;
     //analizar lexicamente la cadena HTML
-    //analizarHTML(htmlResultante);
+    lexicoToHTML(htmlResultante, htmlResultante.length);
 }

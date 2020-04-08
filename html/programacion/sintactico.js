@@ -219,7 +219,7 @@ function LPARAM(){
             var tipoParam = lista[i-1].valor.toLowerCase();
             if(tipoParam == "int" || tipoParam == "double" || tipoParam == "char" || tipoParam == "bool" || tipoParam == "string"){
                 if(tkIgual(lista[i].iden, 1)){
-                    traduccionPython+=tipoParam + " " + lista[i-1].valor;
+                    traduccionPython+="var " + lista[i-1].valor;
                     LPARAM();
                 }
             }

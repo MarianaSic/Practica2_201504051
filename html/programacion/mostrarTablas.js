@@ -3,6 +3,7 @@ function mostrarTodo(){
     mostrarResultadoPython();
     mostrarVariables();
     mostrarHTML();
+    mostrarJSON();
 }
 
 
@@ -63,7 +64,14 @@ function mostrarVariables(){
 
 function mostrarHTML(){
     document.getElementById("outputHTML").innerText = "";
-    document.getElementById("outputHTML").innerText = htmlResultante;
+    var textoHTML = htmlResultante.replace(/'/g, "");
+    document.getElementById("outputHTML").innerText = textoHTML;
     //analizar lexicamente la cadena HTML
-    lexicoToHTML(htmlResultante, htmlResultante.length);
+    lexicoToHTML(textoHTML, textoHTML.length);
+    parser(tokenHTML);
+}
+
+function mostrarJSON(){
+    document.getElementById("outputJson").innerText = "";
+    document.getElementById("outputJson").innerText = traduccionJson;
 }

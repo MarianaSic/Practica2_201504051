@@ -49,6 +49,7 @@ function lexicoToPython(texto, tamano){
                 }
                 else if(texto.charCodeAt(indice) == 39){ // '
                     estado = "D";
+                    auxPalabra+="'";
                     columna++;
                     indice++;
                 }
@@ -115,8 +116,9 @@ function lexicoToPython(texto, tamano){
                 break;
             case "D":
                 if(texto.charCodeAt(indice) == 39){ // '
+                    auxPalabra+="'";
                     let token;
-                    if(auxPalabra.length == 1 || auxPalabra.length == 2)
+                    if(auxPalabra.length == 3 || auxPalabra.length == 4)
                         token = {iden: 3,tipo: 'Caracter', valor: auxPalabra, l:linea, c:columna};
                     else{
                         token = {iden: 4,tipo: 'Cadena HTML', valor: auxPalabra, l:linea, c:columna};
@@ -261,7 +263,14 @@ function lexicoToHTML(texto, tamano){
     while(indice < tamano){
         switch(estado){
             case "A":
-                if(texto.charCodeAt(indice) == 10){ // \n
+                if(texto.charCodeAt(indice) == 62 && texto.charCodeAt(indice+1) != 60){ // hay algo entre > < 
+                    let token1 = {iden: 5, tipo: 'Símbolo', valor: texto[indice], l: linea, c: columna};
+                    tokenHTML.push(token1);
+                    auxPalabra = "";
+                    estado = "D";
+                    indice++;
+                }
+                else if(texto.charCodeAt(indice) == 10){ // \n
                     indice++;
                     linea++;
                     columna = 1;
@@ -292,14 +301,67 @@ function lexicoToHTML(texto, tamano){
                 }
                 break;
             case "B":
-                if(texto.charCodeAt(indice) == 60){ // es <
-
+                let token1 = {iden: 5, tipo: 'Símbolo', valor: auxPalabra, l: linea, c: columna};
+                tokenHTML.push(token1);
+                auxPalabra = "";
+                estado = "A";
+                break;
+            case "C":
+                if(esLetra(texto, indice)){
+                    auxPalabra += texto[indice];
+                    estado = "C";
+                    columna++;
+                    indice++;
+                }else if(esNumero(texto, indice)){
+                    auxPalabra += texto[indice];
+                    estado = "E";
+                    columna++;
+                    indice++;
                 }else{
-                    let token1 = {iden: 5, tipo: 'Símbolo', valor: auxPalabra, l: linea, c: columna};
-                    tokenHTML.push(token1);
+                    if(esReservadaHTML(auxPalabra.toLowerCase())){
+                        let desc = "Palabra reservada: " + auxPalabra.toLowerCase();
+                        let token = {iden: 2, tipo: desc, valor: auxPalabra, l:linea, c:columna};
+                        tokenHTML.push(token);
+                    }else{
+                        let error1 = {tipo: 'Léxico HTML', l: linea, c: columna, desc: ' \"' + auxPalabra + '\" no pertenece al lenguaje'};
+                        listaError.push(error1);
+                    }
                     auxPalabra = "";
                     estado = "A";
                 }
+                break;
+            case "D":
+                if(texto.charCodeAt(indice) == 60){ //  es <
+                    if(!esCadenaVacia(auxPalabra, auxPalabra.length)){
+                        let token = {iden: 6, tipo: 'Cadena', valor: auxPalabra, l: linea, c: columna};
+                        tokenHTML.push(token);
+                    }
+                    auxPalabra = "";
+                    estado = "A";
+                }
+                else if(texto.charCodeAt(indice) == 10){ // \n
+                    estado = "D";
+                    indice++;
+                    columna = 1;
+                    linea++;
+                }else{
+                    auxPalabra+=texto[indice];
+                    estado = "D";
+                    indice++;
+                    columna++;
+                }
+                break;
+            case "E":
+                if(esReservadaHTML(auxPalabra.toLowerCase())){
+                    let desc = "Palabra reservada: " + auxPalabra.toLowerCase();
+                    let token = {iden: 2, tipo: desc, valor: auxPalabra, l:linea, c:columna};
+                    tokenHTML.push(token);
+                }else{
+                    let error1 = {tipo: 'Léxico HTML', l: linea, c: columna, desc: ' \"' + auxPalabra + '\" no pertenece al lenguaje'};
+                    listaError.push(error1);
+                }
+                auxPalabra = "";
+                estado = "A";
                 break;
         }
     }
@@ -353,8 +415,17 @@ function esSimboloHTML(entrada, posicion){
     else return false;
 }
 
+function esCadenaVacia(entrada, tamano){
+    var loEs = 0;
+    for(var i = 0; i < tamano; i++){
+        if(esBlanco(entrada, i)){ loEs++;}
+    }
+    if(loEs == tamano) return true;
+    else return false;
+}
+
 function esBlanco(entrada, posicion){
-    if(entrada.charCodeAt(posicion) == 32) return true;
-    else if(entrada[posicion] == '\t' || entrada[posicion] == '\r') return true;
+    if(entrada.charCodeAt(posicion) == 160 || entrada.charCodeAt(posicion) == 9 || entrada.charCodeAt(posicion) == 11) return true;
+    else if(entrada[posicion] == '\t' || entrada[posicion] == '\r' || entrada[posicion] == " ") return true;
     else return false;
 }

@@ -67,11 +67,11 @@ function CUERPO(){
 function CADENA(numTab){
     if(j < listaH.length){
         console.log(listaH[j].iden)
-        if(tkIgual(listaH[j].iden, 6)){
+        if(tkHIgual(listaH[j].iden, 6)){
             for(var t = 0; t < numTab; t++)
                 traduccionJson+="\t";
             
-            traduccionJson+="\"TEXTO\":\""+listaH[j].valor+"\"\n";
+            traduccionJson+="\"TEXTO\":\""+listaH[j-1].valor+"\"\n";
         }
     }
 }

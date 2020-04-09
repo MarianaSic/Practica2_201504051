@@ -279,7 +279,7 @@ function lexicoToHTML(texto, tamano){
                     indice++;
                     columna++;
                     estado = "A";
-                }else if(esSimbolo(texto, indice)){
+                }else if(esSimboloHTML(texto, indice)){
                     auxPalabra+=texto[indice];
                     estado = "B";
                     columna++;

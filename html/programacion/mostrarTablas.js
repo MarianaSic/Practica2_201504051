@@ -1,9 +1,9 @@
 function mostrarTodo(){
-    mostrarErrores();
     mostrarResultadoPython();
     mostrarVariables();
     mostrarHTML();
     mostrarJSON();
+    mostrarErrores();
 }
 
 

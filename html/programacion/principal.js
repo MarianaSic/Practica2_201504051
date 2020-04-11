@@ -60,6 +60,7 @@ function lexicoToPython(texto, tamano){
                     indice++;
                 }
                 else if(texto.charCodeAt(indice) == 34){ // "
+                    auxPalabra+="\"";
                     estado = "F";
                     columna++;
                     indice++;
@@ -115,7 +116,14 @@ function lexicoToPython(texto, tamano){
                 }
                 break;
             case "D":
-                if(texto.charCodeAt(indice) == 39){ // '
+                if(texto.charCodeAt(indice) == 10){ // \n
+                    auxPalabra+="\n";
+                    indice++;
+                    linea++;
+                    columna = 1;
+                    estado = "D";
+                }
+                else if(texto.charCodeAt(indice) == 39){ // '
                     auxPalabra+="'";
                     let token;
                     if(auxPalabra.length == 3 || auxPalabra.length == 4)
@@ -156,6 +164,7 @@ function lexicoToPython(texto, tamano){
                 break;
             case "F":
                 if(texto.charCodeAt(indice) == 34){ // "
+                    auxPalabra+="\"";
                     let token = {iden: 6, tipo: 'Cadena', valor: auxPalabra, l:linea, c:columna};
                     listaToken.push(token);
                     auxPalabra = "";

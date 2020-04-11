@@ -16,7 +16,7 @@ function INICIO(){
             if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: html") && tkHIgual(listaH[j].valor, ">"))){
                 let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </html>'};
                 listaError.push(error1);
-            }else traduccionJson+="}\n";
+            }else{  traduccionJson+="}\n";}
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <html>'};
             listaError.push(error1);
@@ -37,7 +37,7 @@ function HEAD(){
             if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: head") && tkHIgual(listaH[j].valor, ">"))){
                 let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </head>'};
                 listaError.push(error1);
-            }else traduccionJson+="\t}\n";
+            }else{  traduccionJson+="\t}\n";}
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <head>'};
             listaError.push(error1);
@@ -53,7 +53,7 @@ function TITLE(){
             if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: title") && tkHIgual(listaH[j].valor, ">"))){
                 let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </title>'};
                 listaError.push(error1);
-            }else traduccionJson+="\t\t}\n";
+            }else{  traduccionJson+="\t\t}\n";}
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <title>'};
             listaError.push(error1);
@@ -71,7 +71,7 @@ function CUERPO(){
                 if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: body") && tkHIgual(listaH[j].valor, ">"))){
                     let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </title>'};
                     listaError.push(error1);
-                }else traduccionJson+="\t}\n";
+                }else{  traduccionJson+="\t}\n";}
             }
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <title>'};
@@ -83,48 +83,50 @@ function CUERPO(){
 function LETIQ(numTab){
     if(j < listaH.length){
         if(tkHIgual(listaH[j].valor, "<")){
-            for(var t = 0; t < numTab; t++)
-                traduccionJson+="\t";
-            traduccionJson+="\"";
-            ETIQ(numTab);
-        }
-    }
-}
-
-function ETIQ(numTab){
-    if(j < listaH.length){
-        var etiq = listaH[j].valor.toLowerCase();
-        if(tkHIgual(etiq, "div")){
-            traduccionJson+="DIV\":{\n";
-            STYLE(numTab+1);
-            if(tkHIgual(listaH[j].valor, ">")){
-                LETIQ(numTab+1);
-                if(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].valor.toLowerCase(), "div") && tkHIgual(listaH[j].valor, ">")){
+            if(tkHIgual(listaH[j].valor.toLowerCase(), "div")){
+                for(var t = 0; t < numTab; t++)
+                    traduccionJson+="\t";
+                
+                traduccionJson+="\"DIV\":{\n";
+                STYLE(numTab+1);
+                if(tkHIgual(listaH[j].valor, ">")){
+                    LETIQ(numTab+1);
+                    if(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].valor.toLowerCase(), "div") && tkHIgual(listaH[j].valor, ">")){
+                        
+                        for(var t = 0; t < numTab; t++)
+                            traduccionJson+="\t";
+                        traduccionJson+="}\n"
+                        LETIQ(numTab);
+                    }
+                }
+            }else if(tkHIgual(listaH[j].valor.toLowerCase(), "br") || tkHIgual(listaH[j].valor.toLowerCase(), "input")){
+                var etiq = listaH[j-1].valor.toLowerCase();
+                if(tkHIgual(listaH[j].valor, ">")){
                     for(var t = 0; t < numTab; t++)
                         traduccionJson+="\t";
-
-                    traduccionJson+="}\n"
+                
+                    traduccionJson+= "\"" + etiq.toUpperCase() + "\":\"true\",\n";
                     LETIQ(numTab);
                 }
-            }
-        }else if(tkHIgual(etiq, "br") || tkHIgual(etiq, "input")){
-            if(tkHIgual(listaH[j].valor, ">")){
-                traduccionJson+= etiq.toUpperCase() + "\":\"true\",\n";
-                LETIQ(numTab);
-            }
-        }else if(tkHIgual(etiq, "p") || tkHIgual(etiq, "h1") || tkHIgual(etiq, "h2") || tkHIgual(etiq, "h3") || tkHIgual(etiq, "h4") ||
-        tkHIgual(etiq, "button") || tkHIgual(etiq, "label")){
-            if(tkHIgual(listaH[j].valor, ">")){
-                traduccionJson+= etiq.toUpperCase() + "\":{\n";
-                CADENA(numTab+1);
-                if(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].valor.toLowerCase(), etiq) && tkHIgual(listaH[j].valor, ">")){
+            }else if(tkHIgual(listaH[j].valor.toLowerCase(), "p") || tkHIgual(listaH[j].valor.toLowerCase(), "h1") || tkHIgual(listaH[j].valor.toLowerCase(), "h2") 
+            || tkHIgual(listaH[j].valor.toLowerCase(), "h3") || tkHIgual(listaH[j].valor.toLowerCase(), "h4") ||
+            tkHIgual(listaH[j].valor.toLowerCase(), "button") || tkHIgual(listaH[j].valor.toLowerCase(), "label")){
+                var etiq = listaH[j-1].valor.toLowerCase();
+                if(tkHIgual(listaH[j].valor, ">")){
                     for(var t = 0; t < numTab; t++)
                         traduccionJson+="\t";
-
-                    traduccionJson+="}\n"
-                    LETIQ(numTab);
+                
+                    traduccionJson+= "\"" + etiq.toUpperCase() + "\":{\n";
+                    CADENA(numTab+1);
+                    if(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].valor.toLowerCase(), etiq) && tkHIgual(listaH[j].valor, ">")){
+                        
+                        for(var t = 0; t < numTab; t++)
+                            traduccionJson+="\t";
+                        traduccionJson+="}\n"
+                        LETIQ(numTab);
+                    }
                 }
-            }
+            }else j--;
         }
     }
 }
@@ -141,7 +143,7 @@ function STYLE(numTab){
                 COLOR();
                 if(tkHIgual(listaH[j].valor, "\""))traduccionJson+="\",\n";
             }
-        }else j--; 
+        } 
     }
 }
 

@@ -37,7 +37,7 @@ function HEAD(){
             if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: head") && tkHIgual(listaH[j].valor, ">"))){
                 let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </head>'};
                 listaError.push(error1);
-            }else{  traduccionJson+="\t}\n";}
+            }else{  traduccionJson+="\t},\n";}
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <head>'};
             listaError.push(error1);
@@ -53,7 +53,7 @@ function TITLE(){
             if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: title") && tkHIgual(listaH[j].valor, ">"))){
                 let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </title>'};
                 listaError.push(error1);
-            }else{  traduccionJson+="\t\t}\n";}
+            }else{  traduccionJson+="\t\t},\n";}
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <title>'};
             listaError.push(error1);
@@ -71,7 +71,7 @@ function CUERPO(){
                 if(!(tkHIgual(listaH[j].valor, "<") && tkHIgual(listaH[j].valor, "/") && tkHIgual(listaH[j].tipo, "Palabra reservada: body") && tkHIgual(listaH[j].valor, ">"))){
                     let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba </title>'};
                     listaError.push(error1);
-                }else{  traduccionJson+="\t}\n";}
+                }else{  traduccionJson+="\t},\n";}
             }
         }else{
             let error1 = {tipo: 'Sintáctico HTML', l: listaH[j].l, c: listaH[j].c, desc: ' Se esperaba <title>'};
@@ -95,7 +95,7 @@ function LETIQ(numTab){
                         
                         for(var t = 0; t < numTab; t++)
                             traduccionJson+="\t";
-                        traduccionJson+="}\n"
+                        traduccionJson+="},\n"
                         LETIQ(numTab);
                     }
                 }
@@ -105,7 +105,13 @@ function LETIQ(numTab){
                     for(var t = 0; t < numTab; t++)
                         traduccionJson+="\t";
                 
-                    traduccionJson+= "\"" + etiq.toUpperCase() + "\":\"true\",\n";
+                    traduccionJson+= "\"" + etiq.toUpperCase() + "\":{\n";
+                    for(var t = -1; t < numTab; t++)
+                        traduccionJson+="\t";
+                    traduccionJson += "\"true\"\n";
+                    for(var t = 0; t < numTab; t++)
+                        traduccionJson+="\t";
+                    traduccionJson+="},\n";
                     LETIQ(numTab);
                 }
             }else if(tkHIgual(listaH[j].valor.toLowerCase(), "p") || tkHIgual(listaH[j].valor.toLowerCase(), "h1") || tkHIgual(listaH[j].valor.toLowerCase(), "h2") 
@@ -122,7 +128,7 @@ function LETIQ(numTab){
                         
                         for(var t = 0; t < numTab; t++)
                             traduccionJson+="\t";
-                        traduccionJson+="}\n"
+                        traduccionJson+="},\n"
                         LETIQ(numTab);
                     }
                 }
@@ -172,7 +178,13 @@ function CADENA(numTab){
                 for(var t = 0; t < numTab; t++)
                     traduccionJson+="\t";
                 
-                traduccionJson+="\"BR\":\"true\",\n"
+                traduccionJson+= "\"BR\":{\n";
+                for(var t = -1; t < numTab; t++)
+                    traduccionJson+="\t";
+                traduccionJson += "\"true\"\n";
+                for(var t = 0; t < numTab; t++)
+                    traduccionJson+="\t";
+                traduccionJson+="},\n";
                 CADENA(numTab);
             }else j--;
         }

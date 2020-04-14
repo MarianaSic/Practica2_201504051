@@ -1,3 +1,5 @@
+var textoHTML;
+
 function mostrarTodo(){
     mostrarResultadoPython();
     mostrarVariables();
@@ -36,8 +38,14 @@ function mostrarErrores(){
 }
 
 function mostrarResultadoPython(){
-    document.getElementById("outputPython").innerText = "";
-    document.getElementById("outputPython").innerText = traduccionPython;
+    var txtPython = document.getElementById("outputPython");
+    var editPython = CodeMirror.fromTextArea(txtPython, {
+        lineNumbers: true,
+        theme: "neo",
+        mode: "text/x-python",
+        readOnly: true
+    });
+    editPython.setValue(traduccionPython);
 }
 
 function mostrarVariables(){
@@ -63,15 +71,77 @@ function mostrarVariables(){
 }
 
 function mostrarHTML(){
-    document.getElementById("outputHTML").innerText = "";
-    var textoHTML = htmlResultante.replace(/'/g, "");
-    document.getElementById("outputHTML").innerText = textoHTML;
+    textoHTML = htmlResultante.replace(/'/g, "");
+    var h = document.getElementById("outputHTML");
+    var editHTML = CodeMirror.fromTextArea(h, {
+        lineNumbers: true,
+        theme: "neo",
+        mode: "text/htmlmixed",
+        readOnly: true
+    });
+    editHTML.setValue(textoHTML);
     //analizar lexicamente la cadena HTML
     lexicoToHTML(textoHTML, textoHTML.length);
     parser(tokenHTML);
 }
 
 function mostrarJSON(){
-    document.getElementById("outputJson").innerText = "";
-    document.getElementById("outputJson").innerText = traduccionJson;
+    var j = document.getElementById("outputJson");
+    var editorJSON = CodeMirror.fromTextArea(j, {
+        lineNumbers: true,
+        theme: "neo",
+        mode: {name:"javascript", json: true}
+    });
+    editorJSON.setValue(traduccionJson);
+}
+
+function descargarPython(){
+    var f = new Blob([traduccionPython], {type: 'text/plain'});
+    var nombre = nombreArchivo + ".py";
+    if(window.navigator.msSaveOrOpenBlob) window.navigator.msSaveOrOpenBlob(f, nombre);
+    else{
+        var a = document.createElement("a"), url = URL.createObjectURL(f);
+        a.href = url;
+        a.download = nombre;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        });
+    }
+}
+
+function descargarHTML(){
+    var f = new Blob([textoHTML], {type: 'text/html'});
+    var nombre = nombreArchivo + ".html";
+    if(window.navigator.msSaveOrOpenBlob) window.navigator.msSaveOrOpenBlob(f, nombre);
+    else{
+        var a = document.createElement("a"), url = URL.createObjectURL(f);
+        a.href = url;
+        a.download = nombre;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        });
+    }
+}
+
+function descargarJSON(){
+    var f = new Blob([traduccionJson], {type: 'text/json'});
+    var nombre = nombreArchivo + ".json";
+    if(window.navigator.msSaveOrOpenBlob) window.navigator.msSaveOrOpenBlob(f, nombre);
+    else{
+        var a = document.createElement("a"), url = URL.createObjectURL(f);
+        a.href = url;
+        a.download = nombre;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function(){
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        });
+    }
 }

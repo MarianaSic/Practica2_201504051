@@ -281,13 +281,14 @@ function LINSTRUCCION(conTab){
         }else if(tkIgual(lista[i].iden, 1)){  
             var idValor = lista[i-1].valor;
             if(tkIgual(lista[i].valor, "(")){
-                if(conTab) traduccionPython+="\t";
+                for(var k = 0; k < conTab; k++)
+                    traduccionPython+="\t";
                 traduccionPython+="\ndef " + idValor + "(";
                 LPARAM();
                 if(tkIgual(lista[i].valor, ")")){
                     traduccionPython+="): \n";
                     if(tkIgual(lista[i].valor, "{")){
-                        LINSTRUCCION(true);
+                        LINSTRUCCION(conTab+1);
                         if(!tkIgual(lista[i].valor, "}")){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
                             listaError.push(error1);
@@ -303,10 +304,11 @@ function LINSTRUCCION(conTab){
                     listaError.push(error1);
                     traduccionPython+="):";
                 }
-                LINSTRUCCION(false);
+                LINSTRUCCION(conTab);
             }else if(tkIgual(lista[i].valor, ",")){
                 // , id LISTAID = E ;
-                if(conTab) traduccionPython+="\t";
+                for(var k = 0; k < conTab; k++)
+                    traduccionPython+="\t";
                 traduccionPython+=idValor + ", ";
                 var identi = tkIgual(lista[i].tipo, 'Identificador');
                 if(identi){
@@ -329,7 +331,8 @@ function LINSTRUCCION(conTab){
                 LINSTRUCCION(conTab);
             }else if(tkIgual(lista[i].valor, "=")){
                 // = E ;
-                if(conTab) traduccionPython+="\t";
+                for(var k = 0; k < conTab; k++)
+                    traduccionPython+="\t";
                 traduccionPython+=idValor + " = ";
                 E();
                 if(!tkIgual(lista[i].valor, ";")){
@@ -351,13 +354,14 @@ function LELSEIF(conTab){
     if(i < tamano){
         if(tkIgual(lista[i].valor.toLowerCase(), "else")){
             if(tkIgual(lista[i].valor.toLowerCase(), "if") && tkIgual(lista[i].valor, "(")){
-                if(conTab) traduccionPython+="\t";
+                for(var k = 0; k < conTab; k++)
+                    traduccionPython+="\t";
                 traduccionPython+="elif ";
                 E();
                 if(tkIgual(lista[i].valor, ")") && tkIgual(lista[i].valor, "{")){
-                    traduccionPython+=":\n";
-                    LINSTRUCCION(true);
-                    if(tkIgual(lista[i].valor, "}")) LELSEIF();
+                    traduccionPython+=" :\n";
+                    LINSTRUCCION(conTab+1);
+                    if(tkIgual(lista[i].valor, "}")) LELSEIF(conTab);
                     else{
                         let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
                         listaError.push(error1);
@@ -372,9 +376,10 @@ function ELSE(conTab){
     if(i < tamano){
         if(tkIgual(lista[i].valor.toLowerCase(), "else")){
             if(tkIgual(lista[i].valor, "{")){
-                if(conTab) traduccionPython+="\t";
+                for(var k = 0; k < conTab; k++)
+                    traduccionPython+="\t";
                 traduccionPython+="else:\n"
-                LINSTRUCCION(true);
+                LINSTRUCCION(conTab+1);
                 if(!tkIgual(lista[i].valor, "}")){
                     let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
                     listaError.push(error1);
@@ -422,7 +427,7 @@ function LISTAID(tipo){
 function OPERACION(){
     if(i < tamano){
         if(tkIgual(lista[i].valor, "!")){
-            traduccionPython+="!";
+            traduccionPython+=" not ";
             OPERACION();
         }else if(tkIgual(lista[i].valor, "-")){
             traduccionPython+="-";
@@ -455,7 +460,7 @@ function OPERACION(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "&" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="&&"; 
+                        traduccionPython+=" and "; 
                         OPERACION();
                         break;
                     case "|":
@@ -463,7 +468,7 @@ function OPERACION(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "|" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="||"; 
+                        traduccionPython+=" or "; 
                         OPERACION();
                         break;
                     case ">":
@@ -529,7 +534,7 @@ function OPERACION(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "&" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="&&"; 
+                        traduccionPython+=" and "; 
                         OPERACION();
                         break;
                     case "|":
@@ -537,7 +542,7 @@ function OPERACION(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "|" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="||"; 
+                        traduccionPython+=" or "; 
                         OPERACION();
                         break;
                     case ">":
@@ -577,7 +582,7 @@ function OPERACION(){
 function E(){
     if(i < tamano){
         if(tkIgual(lista[i].valor, "!")){
-            traduccionPython+="!";
+            traduccionPython+=" not ";
             E();
         }else if(tkIgual(lista[i].valor, "-")){
             traduccionPython+="-";
@@ -610,7 +615,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "&" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="&&"; 
+                        traduccionPython+=" and "; 
                         E();
                         break;
                     case "|":
@@ -618,7 +623,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "|" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="||"; 
+                        traduccionPython+=" or "; 
                         E();
                         break;
                     case ">":
@@ -684,7 +689,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "&" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="&&"; 
+                        traduccionPython+=" and "; 
                         E();
                         break;
                     case "|":
@@ -692,7 +697,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "|" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="||"; 
+                        traduccionPython+=" or "; 
                         E();
                         break;
                     case ">":

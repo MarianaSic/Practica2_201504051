@@ -16,6 +16,9 @@
     <link rel="stylesheet" type="text/css" href="../../assets/libs/jquery-minicolors/jquery.minicolors.css">
     <link rel="stylesheet" type="text/css" href="../../assets/libs/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css">
     <link rel="stylesheet" type="text/css" href="../../assets/libs/quill/dist/quill.snow.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/libs/codemirror/theme/idea.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/libs/codemirror/theme/neo.css">
+    <link rel="stylesheet" type="text/css" href="../../assets/libs/codemirror/lib/codemirror.css">
     <link href="../../dist/css/style.min.css" rel="stylesheet">
     <link href="../../assets/libs/toastr/build/toastr.min.css" rel="stylesheet">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -108,9 +111,9 @@
                                             <div>
                                                 <label id="labelArchivo"></label>
                                             </div>
-                                            <!-- Create the editor container -->
-                                            <div id="editor" style="height: 300px;">
-                                                
+                                            <!-- LUGAR DEL TEXTAREA -->
+                                            <div>
+                                                <textarea id="txtEntrada"></textarea>
                                             </div>
                                             <div class="card-body">
                                                 <button id="btnBorrar" type="button" class="btn btn-danger margin-5 text-white" data-toggle="modal" data-target="#Modal2" disabled>
@@ -191,7 +194,10 @@
                         <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
                           <div class="card-body">
                             <h5 class="card-title">&#9002; Código resultante en Python</h5>
-                                <pre text-align="text-center" id="outputPython"></pre>
+                                <textarea id="outputPython"></textarea>
+                          </div>
+                          <div class="card-body">
+                            <button type="button" class="btn btn-outline-info" onclick="descargarPython()">Descargar Python</button>
                           </div>
                         </div>
                     </div>
@@ -215,12 +221,18 @@
                             <div class="tab-content tabcontent-border">
                                 <div class="tab-pane active" id="html" role="tabpanel">
                                     <div class="p-20">
-                                        <pre id="outputHTML"></pre>
+                                        <textarea id="outputHTML"></textarea>
+                                    </div>
+                                    <div class="card-body">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="descargarHTML()">Descargar HTML</button>
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="json" role="tabpanel">
                                     <div class="p-20">
-                                        <pre id="outputJson"></pre>
+                                        <textarea id="outputJson"></textarea>
+                                    </div>
+                                    <div class="card-body">
+                                        <button type="button" class="btn btn-outline-warning" onclick="descargarJSON()">Descargar Json</button>
                                     </div>
                                 </div>
                             </div>
@@ -309,26 +321,36 @@
     <script src="../../dist/js/pages/mask/mask.init.js"></script>
     <script src="../../assets/libs/quill/dist/quill.min.js"></script>
     <script src="../../assets/libs/toastr/build/toastr.min.js"></script>
+    <script src="../../assets/libs/codemirror/lib/codemirror.js"></script>
+    <script src="../../assets/libs/codemirror/mode/clike/clike.js"></script>
+    <script src="../../assets/libs/codemirror/mode/clike/test.js"></script>
+    <script src="../../assets/libs/codemirror/mode/python/python.js"></script>
+    <script src="../../assets/libs/codemirror/mode/xml/xml.js"></script>
+    <script src="../../assets/libs/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="../../assets/libs/codemirror/mode/javascript/javascript.js"></script>
     <script>
+        var myTextarea = document.getElementById("txtEntrada");
+        var editor = CodeMirror.fromTextArea(myTextarea, {
+            lineNumbers: true,
+            theme: "idea",
+            mode: "text/x-csharp"
+        });
+
+        var nombreArchivo;
         var listaError = new Array();
         var titulo = document.getElementById("labelArchivo");
         var btnBorrar = document.getElementById("btnBorrar");
-        var quill = new Quill('#editor', {
-            modules: {
-                toolbar: false
-            },
-            theme: 'snow'
-        });
 
         function processFiles() {
             var file = document.getElementById("selector").files[0];
             var tipo = file.name.split('.')[1];
+            nombreArchivo = file.name.split('.')[0];
             if(tipo == 'cs' || tipo == 'CS'){
                 toastr.success('Se cargó el archivo \"' + file.name + '\" exitosamente', 'Carga de archivo exitosa');
                 titulo.innerText = file.name;
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    quill.setText(e.target.result);
+                    editor.setValue(e.target.result);
                 };
                 reader.readAsText(file);
                 btnBorrar.disabled = false;
@@ -345,8 +367,8 @@
         }
         function traducir(){
             btnBorrar.disabled = false;
-            const entrada = quill.getText(0, quill.getLength());
-            lexicoToPython(entrada, quill.getLength());
+            const entrada = editor.getValue();
+            lexicoToPython(entrada, (entrada.length+1));
             console.log(listaToken);
             sintacticoToPython();
             mostrarTodo();

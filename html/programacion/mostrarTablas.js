@@ -38,13 +38,6 @@ function mostrarErrores(){
 }
 
 function mostrarResultadoPython(){
-    var txtPython = document.getElementById("outputPython");
-    var editPython = CodeMirror.fromTextArea(txtPython, {
-        lineNumbers: true,
-        theme: "neo",
-        mode: "text/x-python",
-        readOnly: true
-    });
     editPython.setValue(traduccionPython);
 }
 
@@ -56,6 +49,9 @@ function mostrarVariables(){
 
     for(var i = 0; i < listaVariables.length; i++){
         var tr = document.createElement('tr');
+        var td0 = document.createElement('td');
+        td0.innerHTML = (i+1);
+        tr.appendChild(td0);
         var td1 = document.createElement('td');
         td1.innerHTML = listaVariables[i].nombre;
         tr.appendChild(td1);
@@ -72,13 +68,6 @@ function mostrarVariables(){
 
 function mostrarHTML(){
     textoHTML = htmlResultante.replace(/'/g, "");
-    var h = document.getElementById("outputHTML");
-    var editHTML = CodeMirror.fromTextArea(h, {
-        lineNumbers: true,
-        theme: "neo",
-        mode: "text/htmlmixed",
-        readOnly: true
-    });
     editHTML.setValue(textoHTML);
     //analizar lexicamente la cadena HTML
     lexicoToHTML(textoHTML, textoHTML.length);
@@ -86,12 +75,6 @@ function mostrarHTML(){
 }
 
 function mostrarJSON(){
-    var j = document.getElementById("outputJson");
-    var editorJSON = CodeMirror.fromTextArea(j, {
-        lineNumbers: true,
-        theme: "neo",
-        mode: {name:"javascript", json: true}
-    });
     editorJSON.setValue(traduccionJson);
 }
 

@@ -4,6 +4,10 @@ var cantTabs = 2;
 var listaH = new Array();
 
 function parser(l){
+    traduccionJson = "";
+    j = 0;
+    cantTabs = 2;
+    listaH = [];
     listaH = l;
     INICIO();
 }

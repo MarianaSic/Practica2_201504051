@@ -1,8 +1,3 @@
-var i = 0;
-var lista, tamano;
-var traduccionPython = "\n";
-var htmlResultante = "";
-var listaVariables = new Array();
 
 function sintacticoToPython(){
     lista = listaToken;
@@ -188,11 +183,37 @@ function LINSTRUCCION(conTab){
                 }
             }/* SWITCH */ else if(tkIgual(lista[i].valor.toLowerCase(), "switch")){
                 if(tkIgual(lista[i].valor, "(")){
-                    
+                    traduccionPython+="\n";
+                    for(var k = 0; k < conTab; k++)
+                        traduccionPython+="\t";
+                    traduccionPython+="def switch(";
+                    E();
+                    if(tkIgual(lista[i].valor, ")") && tkIgual(lista[i].valor, "{")){
+                        traduccionPython+="):\n";
+                        for(var k = 0; k < conTab; k++)
+                            traduccionPython+="\t";
+                        traduccionPython+="\tswitcher = {\n";
+                        LCASES(conTab+2);
+                        for(var k = 0; k < conTab; k++)
+                            traduccionPython+="\t";
+                        traduccionPython+="\t}\n";
+                        DEFAULT(conTab+1);
+                        if(!tkIgual(lista[i].valor, "}")){
+                            let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "}" y vino ' + lista[i].valor};
+                            listaError.push(error1);
+                        }
+                        LINSTRUCCION(conTab);
+                    }
                 }
             }/* FOR */ else if(tkIgual(lista[i].valor.toLowerCase(), "for")){
                 if(tkIgual(lista[i].valor, "(")){
+                    for(var k = 0; k < conTab; k++)
+                        traduccionPython+="\t";
+                    traduccionPython+="for ";
                     DECLFOR();
+                    LINSTRUCCION(conTab+1);
+                    tkIgual(lista[i].valor, "}");
+                    LINSTRUCCION(conTab);
                 }
             }/* WHILE */ else if(tkIgual(lista[i].valor.toLowerCase(), "while")){
                 if(tkIgual(lista[i].valor, "(")){
@@ -350,6 +371,62 @@ function LINSTRUCCION(conTab){
     }
 }
 
+function LCASES(conTab){
+    if(i < tamano){
+        if(tkIgual(lista[i].valor.toLowerCase(), "case")){
+            for(var k = 0; k < conTab; k++)
+                traduccionPython+="\t";
+            E();
+            if(tkIgual(lista[i].valor, ":")){
+                traduccionPython+=":\n";
+                LINSTRUCCION(conTab+1);
+                for(var k = 0; k < conTab; k++)
+                    traduccionPython+="\t";
+                traduccionPython+=",\n";
+                LCASES(conTab);
+            }
+        }
+    }
+}
+
+function DEFAULT(conTab){
+    if(i < tamano){
+        if(tkIgual(lista[i].valor.toLowerCase(), "default") && tkIgual(lista[i].valor, ":")){
+            LINSTRUCCION(conTab);
+            traduccionPython+="\n";
+        }
+    }
+}
+
+function DECLFOR(){
+    if(i < tamano){
+        if(tkIgual(lista[i].valor.toLowerCase(), "int") || tkIgual(lista[i].valor.toLowerCase(), "double")){
+            if(tkIgual(lista[i].iden, 1)){
+                traduccionPython+=lista[i-1].valor + " in range(";
+                if(tkIgual(lista[i].valor, "=")){
+                    if(tkIgual(lista[i].iden, 7) || tkIgual(lista[i].iden, 1)){
+                        traduccionPython+=lista[i-1].valor + ", ";
+                        if(tkIgual(lista[i].valor, ";") && tkIgual(lista[i].iden, 1) && tkIgual(lista[i].valor, "<")){
+                            if(tkIgual(lista[i].iden, 7) || tkIgual(lista[i].iden, 1)){
+                                traduccionPython+=lista[i-1].valor + "):\n";
+                                tkIgual(lista[i].valor, ";");
+                                tkIgual(lista[i].iden, 1);
+                                tkIgual(lista[i].valor, "+");
+                                tkIgual(lista[i].valor, "+");
+                                tkIgual(lista[i].valor, ")");
+                                tkIgual(lista[i].valor, "{");
+                            }
+                        }
+                    }
+                }
+            }
+        }else{
+            let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "double" ó "int" y vino ' + lista[i].valor};
+            listaError.push(error1);
+        }
+    }
+}
+
 function LELSEIF(conTab){
     if(i < tamano){
         if(tkIgual(lista[i].valor.toLowerCase(), "else")){
@@ -359,7 +436,7 @@ function LELSEIF(conTab){
                 traduccionPython+="elif ";
                 E();
                 if(tkIgual(lista[i].valor, ")") && tkIgual(lista[i].valor, "{")){
-                    traduccionPython+=" :\n";
+                    traduccionPython+=":\n";
                     LINSTRUCCION(conTab+1);
                     if(tkIgual(lista[i].valor, "}")) LELSEIF(conTab);
                     else{
@@ -595,19 +672,19 @@ function E(){
                 var operador = lista[i-1].valor;
                 switch(operador){
                     case "+":
-                        traduccionPython+="+"; 
+                        traduccionPython+=" + "; 
                         E();
                         break;
                     case "-":
-                        traduccionPython+="-"; 
+                        traduccionPython+=" - "; 
                         E();
                         break;
                     case "*":
-                        traduccionPython+="*"; 
+                        traduccionPython+=" * "; 
                         E();
                         break;
                     case "/":
-                        traduccionPython+="/"; 
+                        traduccionPython+=" / "; 
                         E();
                         break;
                     case "&":
@@ -627,12 +704,12 @@ function E(){
                         E();
                         break;
                     case ">":
-                        traduccionPython+=">";
+                        traduccionPython+=" > ";
                         if(tkIgual(lista[i].valor, "=")){ traduccionPython+="="; E();}
                         E();
                         break;
                     case "<":
-                        traduccionPython+="<";
+                        traduccionPython+=" < ";
                         if(tkIgual(lista[i].valor, "=")){ traduccionPython+="="; E();}
                         E();
                         break;
@@ -641,7 +718,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "=" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="!="; 
+                        traduccionPython+=" != "; 
                         E();
                         break;
                     case "=":
@@ -649,7 +726,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "=" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="=="; 
+                        traduccionPython+=" == "; 
                         E();
                         break;
                     default:
@@ -669,19 +746,19 @@ function E(){
                 var operador = lista[i-1].valor;
                 switch(operador){
                     case "+":
-                        traduccionPython+="+"; 
+                        traduccionPython+=" + "; 
                         E();
                         break;
                     case "-":
-                        traduccionPython+="-"; 
+                        traduccionPython+=" - "; 
                         E();
                         break;
                     case "*":
-                        traduccionPython+="*"; 
+                        traduccionPython+=" * "; 
                         E();
                         break;
                     case "/":
-                        traduccionPython+="/"; 
+                        traduccionPython+=" / "; 
                         E();
                         break;
                     case "&":
@@ -701,12 +778,12 @@ function E(){
                         E();
                         break;
                     case ">":
-                        traduccionPython+=">";
+                        traduccionPython+=" > ";
                         if(tkIgual(lista[i].valor, "=")){ traduccionPython+="="; E();}
                         E();
                         break;
                     case "<":
-                        traduccionPython+="<";
+                        traduccionPython+=" < ";
                         if(tkIgual(lista[i].valor, "=")){ traduccionPython+="="; E();}
                         E();
                         break;
@@ -715,7 +792,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "=" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="!="; 
+                        traduccionPython+=" != "; 
                         E();
                         break;
                     case "=":
@@ -723,7 +800,7 @@ function E(){
                             let error1 = {tipo: 'Sintáctico', l: lista[i].l, c: lista[i].c, desc: ' Se esperaba "=" y vino ' + lista[i].valor};
                             listaError.push(error1);
                         }
-                        traduccionPython+="=="; 
+                        traduccionPython+=" == "; 
                         E();
                         break;
                     default:

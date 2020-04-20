@@ -11,9 +11,12 @@ var reservadaHTML = ["html", "head", "body", "title", "div", "br", "p", "h1", "h
 var codHTML = "";
 
 function lexicoToPython(texto, tamano){
-    indice = 0; linea = 1; columna = 1;
     listaToken = [];
     listaError = [];
+    estado = "A";
+    indice = 0;
+    linea = 1;
+    columna = 1;
     var auxPalabra = "";
     while(indice < tamano){
         switch(estado){
@@ -261,7 +264,6 @@ function lexicoToPython(texto, tamano){
                 break;
         }
     }
-    return listaToken;
 }
 
 function lexicoToHTML(texto, tamano){

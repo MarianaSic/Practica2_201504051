@@ -87,7 +87,7 @@ function CUERPO(){
 function LETIQ(numTab){
     if(j < listaH.length){
         if(tkHIgual(listaH[j].valor, "<")){
-            if(tkHIgual(listaH[j].valor.toLowerCase(), "div")){
+            /* DIV */if(tkHIgual(listaH[j].valor.toLowerCase(), "div")){
                 for(var t = 0; t < numTab; t++)
                     traduccionJson+="\t";
                 
@@ -103,7 +103,7 @@ function LETIQ(numTab){
                         LETIQ(numTab);
                     }
                 }
-            }else if(tkHIgual(listaH[j].valor.toLowerCase(), "br") || tkHIgual(listaH[j].valor.toLowerCase(), "input")){
+            }/* BR | INPUT */else if(tkHIgual(listaH[j].valor.toLowerCase(), "br") || tkHIgual(listaH[j].valor.toLowerCase(), "input")){
                 var etiq = listaH[j-1].valor.toLowerCase();
                 if(tkHIgual(listaH[j].valor, ">")){
                     for(var t = 0; t < numTab; t++)
@@ -118,7 +118,7 @@ function LETIQ(numTab){
                     traduccionJson+="},\n";
                     LETIQ(numTab);
                 }
-            }else if(tkHIgual(listaH[j].valor.toLowerCase(), "p") || tkHIgual(listaH[j].valor.toLowerCase(), "h1") || tkHIgual(listaH[j].valor.toLowerCase(), "h2") 
+            }/* P .. LABEL  */else if(tkHIgual(listaH[j].valor.toLowerCase(), "p") || tkHIgual(listaH[j].valor.toLowerCase(), "h1") || tkHIgual(listaH[j].valor.toLowerCase(), "h2") 
             || tkHIgual(listaH[j].valor.toLowerCase(), "h3") || tkHIgual(listaH[j].valor.toLowerCase(), "h4") ||
             tkHIgual(listaH[j].valor.toLowerCase(), "button") || tkHIgual(listaH[j].valor.toLowerCase(), "label")){
                 var etiq = listaH[j-1].valor.toLowerCase();
@@ -200,7 +200,6 @@ function tkHIgual(elemento, entrada){
         if(j < listaH.length){
             j++;
             return true;
-        }
-        else return false;
+        }else return false;
     }else return false;
 }

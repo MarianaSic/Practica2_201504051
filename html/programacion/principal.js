@@ -4,11 +4,11 @@ var estado = "A";
 var indice = 0;
 var linea = 1;
 var columna = 1;
-var reservadas = ["int", "double", "char", "bool", "string", "void", "main", "if", "do", "false", "continue", "else", "switch", "case", "break",
-    "console", "write", "default", "for", "while", "true", "return"];
 var reservadaHTML = ["html", "head", "body", "title", "div", "br", "p", "h1", "h2", "h3", "h4", "button", "red", "label", "input", "style",
     "background", "yellow", "green", "blue", "white", "skyblue"];
 var codHTML = "";
+var reservadas = ["int", "double", "char", "bool", "string", "void", "main", "if", "do", "false", "continue", "else", "switch", "case", "break",
+    "console", "write", "default", "for", "while", "true", "return"];
 
 function lexicoToPython(texto, tamano){
     listaToken = [];
